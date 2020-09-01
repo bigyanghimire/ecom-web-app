@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Document</title>
+    <style>
+        .discount_input {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <h1>Add a new Product</h1>
+        <form action="http://localhost:3001/sr/product" method="post">
+            <label for="fname">Name of product:</label>
+            <input type="text" id="fname" name="name"><br><br>
+            <label for="lname">PRICE:</label>
+            <input type="text" id="fprice" name="price"><br><br>
+            <label for="lname">description:</label>
+            <input type="text" id="fdesc" name="description"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+
+        <form method="post" id="uploadForm" enctype="multipart/form-data" action="http://localhost:3001/sr/upload">
+            <p>
+                <input type="text" name="title" placeholder="optional title" />
+            </p>
+
+            <p>
+                <input type="file" name="upl" />
+            </p>
+
+            <p>
+                <input type="submit" />
+            </p>
+        </form>
+
+
+
+    </div>
+    <div class="container">
+        <div class="row">
+            <% titles.forEach(function(title) { %>
+            <div class="col-md-4">
+
+                <div class="card mb-4 border-dark">
+                    <img class="card-img-top" src="//placeimg.com/290/180/any" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= title.name %> </h5>
+                        Original Price: <%= title.price %>
+                        Discount Price: <strong><%= title.price-(title.discount) %></strong>
+                        <!---
+                            <%if (title.discount.includes('%')) { %>
+                        <h2>hello</h2>
+                        Discount Price: <strong><%= title.price-(title.discount) %></strong>
+                        <%= title.discount.substring(0, title.discount.lastIndexOf(" ")) %> <% } %> <p
+                            class="card-text"><%= title.description %></p>
+                            -->
+                        <a href="http://localhost:3001/sr/product/1" class="btn btn-outline-dark btn-sm">Edit the
+                            product</a>
+                    </div>
+
+
+
+                    <div class="container">
+                        <!---->
+                        <h3>Edit Product</h3>
+                        <form action="http://localhost:3001/sr/update/1" method="post">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Name</label>
+                                <input class="form-control" name="name" aria-describedby="emailHelp"
+                                    placeholder="Enter name">
+
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Price</label>
+                                <input class="form-control" name="price" placeholder="Enter Price">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">description</label>
+                                <input class="form-control" name="description" placeholder="Enter description">
+                            </div>
+
+                            <button class="discount_btn" class="btn btn-warning">Add
+                                Discount</button>
+                            <div class="form-group" class="discount_input">
+                                <label for="exampleInputPassword1">Discount</label>
+                                <input class="form-control" name="discount" placeholder="Enter discount">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add too cart</button>
+                </div>
+            </div>
+
+            <% }); %>
+
+
+
+
+        </div>
+    </div>
+    <script>
+        var discount_input = document.getElementsByClassName("discount_input");
+        var discount_btn = document.getElementsByClassName("discount_btn");
+        for (var i = 0; i < discount_btn.length; i++) {
+            discount_btn[i].addEventListener("click", function (event) {
+                event.preventDefault()
+                if (discount_input[i].style.display === "none") {
+                    discount_input[i].style.display = "block";
+                } else {
+                    discount_input[i].style.display = "none";
+                }
+            });
+        }
+
+
+
+
+
+    </script>
+</body>
+
+</html>
