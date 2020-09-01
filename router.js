@@ -12,7 +12,7 @@ var multerS3 = require('multer-s3'); //"^1.4.1"
 // invoke an instance of express application.
 
 var s3 = new aws.S3();
-
+//upload settiungs for multer
 var upload = multer({
     storage: multerS3({
         s3: s3,
@@ -20,7 +20,7 @@ var upload = multer({
         ACL: 'public-read',
         key: function (req, file, cb) {
             console.log(file);
-            cb(null, file.originalname); //use Date.now() for unique file keys
+            cb(null, file.originalname);
         }
     })
 });
@@ -36,7 +36,7 @@ const uploadParams = {
 };
 
 
-
+//post product
 
 router.post('/product', (req, res) => {
 
@@ -56,6 +56,75 @@ router.post('/product', (req, res) => {
 
 
 });
+//
+router.post('/update/:id', (req, res) => {
+
+    queries
+        .product
+        .update(req.params.id, req.body)
+        .then(product => {
+
+            res.json(product)
+
+        });
+
+    /*
+        knex('users').insert(req.body).then(function (ret) {
+            res.json({ success: true, message:  });
+        });*/
+
+
+});
+//GET LIST OF PRODUCTS
+router.get('/product', (req, res) => {
+    queries
+        .product
+        .getAll()
+        .then(product => {
+            // res.json(product)
+            res.render('product-page', {
+                titles: product,
+                tagline: "hello this is taglne"
+
+            });
+        })
+})
+//GET A SINGLE PRODUCT
+router.get('/product/:id', (req, res) => {
+    queries
+        .product
+        .getOne(req.params.id)
+        .then(product => {
+            res.json(product)
+
+        });
+
+
+});
+
+router.post('/upload', upload.single('file'), function (err, req, res, next) {
+    // res.send(req.files);
+    const params = uploadParams;
+
+    params.Key = req.file.originalname;
+    params.Body = req.file.buffer;
+    s3Client.upload(params, (err, data) => {
+        if (err) {
+            res.status(500).json({ error: "Error -> " + err });
+        }
+        queries
+            .product
+            .updateUrl(req.params.id, req.file.location)
+            .then(product => {
+                res.render('upload_confirm', { file_location: req.file.location })
+
+
+            });
+
+    });
+});
+//SHOPPING CART STARTS
+// add a single item to shopping cart
 router.get('/add/:id', function (req, res, next) {
 
     var productId = req.params.id;
@@ -91,64 +160,6 @@ router.get('/remove/:id', function (req, res, next) {
     req.session.cart = cart;
     res.redirect('/cart');
 });
-router.post('/update/:id', (req, res) => {
-
-    queries
-        .product
-        .update(req.params.id, req.body)
-        .then(product => {
-
-            res.json(product)
-
-        });
-
-    /*
-        knex('users').insert(req.body).then(function (ret) {
-            res.json({ success: true, message:  });
-        });*/
-
-
-});
-router.get('/product', (req, res) => {
-    queries
-        .product
-        .getAll()
-        .then(product => {
-            // res.json(product)
-            res.render('product-page', {
-                titles: product,
-                tagline: "hello this is taglne"
-
-            });
-        })
-})
-router.get('/product/:id', (req, res) => {
-    queries
-        .product
-        .getOne(req.params.id)
-        .then(product => {
-            res.json(product)
-
-        });
-
-
-});
-
-router.post('/upload', upload.single('file'), function (err, req, res, next) {
-    // res.send(req.files);
-    const params = uploadParams;
-
-    params.Key = req.file.originalname;
-    params.Body = req.file.buffer;
-    s3Client.upload(params, (err, data) => {
-        if (err) {
-            res.status(500).json({ error: "Error -> " + err });
-        }
-        res.render('upload_confirm', { message: 'File uploaded successfully! -> keyname = ' + req.file.location })
-            .then();
-    });
-});
-
 
 
 

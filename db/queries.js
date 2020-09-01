@@ -12,6 +12,9 @@ module.exports = {
         },
         update: function (prodId, product) {
             return knex('product_table').where({ id: prodId }).update(product);
+        },
+        updateUrl: function (prodId, url) {
+            return knex('product_table').where({ id: prodId }).update({ url: url });
         }
     }
 }
